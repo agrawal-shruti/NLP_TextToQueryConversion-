@@ -1,0 +1,148 @@
+<html>
+<head>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<form class="form-inline">
+<!--Last Name-->
+<div class="form-group">
+<label class="sr-only" for="lastName">Question</label>
+<input type="text" class="form-control" id="question" placeholder="question">
+</div>
+
+<!--Submit Button-->
+<button type="submit" class="btn btn-default">Submit</button>
+</form>
+</br>
+<div id="output"></div>
+</br>
+<div id = "finalOutput"></div>
+<div id = "finalCube"></div>
+<div id = "finalMeasures"></div>
+<div id = "finalDimensions"></div>
+<div id = "finalFilters"></div>
+<div id = "finalheir"></div>
+
+<script>
+
+$(document).ready(function() {
+     $('form').on('submit', function(event) {
+       $.ajax({
+          data : {
+             question: $('#question').val(),
+                 },
+             type : 'POST',
+             url : '/process_measure',
+             dataType : "json",
+             success: function (data) {
+
+                console.log(data)
+                $.each(data, function(k,v)              { 
+                    $("#output").append('<br>' + k + v)
+                    if(k == "Input" && v!= ' '){
+                        $("#output").append('<br><input id="CubeName" placeholder = "CubeName" type="text" /> <input type="button" id = "submitCube" class="submitCube"  value="submit" onclick="findDimension()"/>');
+                            
+                    }
+                    else if(k == "CubeName" && v!= ' '){
+                        findDimension();
+                    }
+             });
+            
+
+        },
+        error: function (response) {
+            alert('error');
+        }
+            })
+        .done(function(data) {
+            
+         
+      });
+      event.preventDefault();
+      });
+
+
+});
+
+     function findDimension(){
+     $.ajax({
+          data : {
+             CubeName: $('#CubeName').val(),
+                 },
+             type : 'POST',
+             url : '/process_dimension',
+             dataType : "json",
+             success: function (data) {
+
+                console.log(data)
+                $.each(data, function(k,v)              { 
+                    $("#finalOutput").append('<br>' + v)
+                    if(k == "Input" && v!= ' '){
+                        $("#finalOutput").append('<br><input id="DimName" placeholder = "DimName" type="text" /> <input type="button" id = "submitDim" class="submitDim"  value="submit" onclick="resolveFilter()"/>');
+                            
+                    }
+                    else if(k == "Success" && v!= ' '){
+                        resolveFilter();
+                    }                });
+
+                          
+
+        },
+        error: function (response) {
+            alert('error');
+        }
+            })
+        .done(function(data) {
+            
+         
+      });
+      event.preventDefault();
+      
+
+
+     }
+
+function resolveFilter(){
+     $.ajax({
+          data : {
+             DimName: $('#DimName').val(),
+                 },
+             type : 'POST',
+             url : '/resolve_filter',
+             dataType : "json",
+             success: function (data) {
+             	console.log(data)
+                $.each(data, function(k,v)  
+                    {
+                        if(k == "CubeName")
+                            $("#finalCube").append('<br>' + k + ' ' + v)
+                        else if (k== "Measures")
+                             $("#finalMeasures").append('<br>' + k + ' ' + v)
+                        else if (k== "Dimensions")
+                             $("#finalDimensions").append('<br>' + k + ' ' + v)
+                        else if (k== "Filter")
+                             $("#finalFilters").append('<br>' + k + ' ' + v)
+                        else if (k== "DimensionFilterHeirarchy")
+                             $("#finalheir").append('<br>' + k + ' ' + v)
+               
+                });
+
+                          
+
+        },
+        error: function (response) {
+            alert('error');
+        }
+            })
+        .done(function(data) {
+            
+         
+      });
+      event.preventDefault();
+      
+
+
+     }
+
+
+</script>
+</html>

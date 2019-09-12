@@ -1,0 +1,95 @@
+<html>
+<head>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<form class="form-inline">
+<!--Last Name-->
+<div class="form-group">
+<label class="sr-only" for="lastName">Question</label>
+<input type="text" class="form-control" id="question" placeholder="question">
+</div>
+
+<!--Submit Button-->
+<button type="submit" class="btn btn-default">Submit</button>
+</form>
+</br>
+<div id="output"></div>
+</br>
+<div id = "finalOutput"></div>
+<script>
+
+$(document).ready(function() {
+     $('form').on('submit', function(event) {
+       $.ajax({
+          data : {
+             question: $('#question').val(),
+                 },
+             type : 'POST',
+             url : '/process_measure',
+             dataType : "json",
+             success: function (data) {
+
+             	alert(data)
+
+             	$.each(data, function(k,v)             	{ 
+             		$("#output").append('<br>' + v)
+             		if(k == "AddInput"){
+		             	$("#output").append('<br><input id="CubeName" placeholder = "CubeName" type="text" /> <input type="button" id = "submitCube" class="submitCube"  value="submit" onclick="findDimension()"/>');
+		             		
+             		}
+	                else if(k == "Success"){
+	                	findDimension();
+	                }
+             });
+            
+
+        },
+        error: function (response) {
+            alert('error');
+        }
+            })
+        .done(function(data) {
+        	
+         
+      });
+      event.preventDefault();
+      });
+
+
+});
+
+     function findDimension(){
+     $.ajax({
+          data : {
+             CubeName: $('#CubeName').val(),
+                 },
+             type : 'POST',
+             url : '/process_dimension',
+             dataType : "json",
+             success: function (data) {
+
+            	alert(data)
+            	$.each(data, function(k,v)             	{ 
+             		$("#finalOutput").append('<br>' + k + ' ' + v)
+             	});
+
+            	          
+
+        },
+        error: function (response) {
+            alert('error');
+        }
+            })
+        .done(function(data) {
+        	
+         
+      });
+      event.preventDefault();
+      
+
+
+     }
+
+
+</script>
+</html>
